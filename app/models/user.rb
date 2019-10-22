@@ -1,13 +1,30 @@
 class User < ApplicationRecord
-  enum role: [:admin, :student, :teacher]
+  has_many :roles
 
-  belongs_to :department
+  def student?
+    roles.includes? :student
+  end
 
-  # for teachers and students
-  has_many :course_registration
-  has_many :course, through: :course_registration
+  def teacher?
+    roles.includes? :teacher
+  end
 
-  # for students
-  has_many :final_signups
-  has_many :finals, through: :final_signups
+  def admin?
+    roles.includes? :admin
+  end
+
+  def as_student
+    raise TypeError, "User is not a Student!" unless student?
+    Student.find(id)
+  end
+
+  def as_teacher
+    raise TypeError, "User is not a Teacher" unless teacher?
+    Teacher.find(id)
+  end
+
+  def as_admin
+    raise TypeError, "User is not an Admin" unless admin?
+    Admin.find(id)
+  end
 end

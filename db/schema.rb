@@ -10,18 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_10_21_045317) do
+ActiveRecord::Schema.define(version: 2019_10_21_230449) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
-  create_table "course_registrations", force: :cascade do |t|
+  create_table "admins", primary_key: "user_id", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "user_id", null: false
-    t.bigint "course_id", null: false
-    t.index ["course_id"], name: "index_course_registrations_on_course_id"
-    t.index ["user_id"], name: "index_course_registrations_on_user_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -57,9 +53,44 @@ ActiveRecord::Schema.define(version: 2019_10_21_045317) do
     t.index ["course_id"], name: "index_finals_on_course_id"
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.integer "role_type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "student_course_registrations", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "student_id", null: false
+    t.bigint "course_id", null: false
+    t.index ["course_id"], name: "index_student_course_registrations_on_course_id"
+    t.index ["student_id"], name: "index_student_course_registrations_on_student_id"
+  end
+
+  create_table "students", primary_key: "user_id", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "teacher_course_registrations", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "teacher_id", null: false
+    t.bigint "course_id", null: false
+    t.index ["course_id"], name: "index_teacher_course_registrations_on_course_id"
+    t.index ["teacher_id"], name: "index_teacher_course_registrations_on_teacher_id"
+  end
+
+  create_table "teachers", primary_key: "user_id", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "department_id", null: false
+    t.index ["department_id"], name: "index_teachers_on_department_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "username"
-    t.string "password"
     t.string "first_name"
     t.string "middle_name"
     t.string "last_name"
@@ -67,15 +98,18 @@ ActiveRecord::Schema.define(version: 2019_10_21_045317) do
     t.string "profile_photo"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "department_id", null: false
-    t.index ["department_id"], name: "index_users_on_department_id"
+    t.bigint "role_id", null: false
+    t.index ["role_id"], name: "index_users_on_role_id"
   end
 
-  add_foreign_key "course_registrations", "courses"
-  add_foreign_key "course_registrations", "users"
   add_foreign_key "courses", "departments"
   add_foreign_key "final_signups", "finals"
   add_foreign_key "final_signups", "users", column: "student_id"
   add_foreign_key "finals", "courses"
-  add_foreign_key "users", "departments"
+  add_foreign_key "student_course_registrations", "courses"
+  add_foreign_key "student_course_registrations", "users", column: "student_id"
+  add_foreign_key "teacher_course_registrations", "courses"
+  add_foreign_key "teacher_course_registrations", "users", column: "teacher_id"
+  add_foreign_key "teachers", "departments"
+  add_foreign_key "users", "roles"
 end

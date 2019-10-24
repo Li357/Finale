@@ -1,6 +1,8 @@
-class Types::UserError < Types::BaseObject
-  description "A user-readable error"
+module Types
+  class UserError < BaseObject
+    description "User-readable error"
 
-  field :message, String, null: false,
-    description: "A description of the error"
+    field :message, String, null: false,
+      description: "Description of the error"
+  end
 end

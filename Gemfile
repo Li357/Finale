@@ -10,8 +10,8 @@ gem 'pg', '>= 0.18', '< 2.0'
 # Use Puma as the app server
 gem 'puma', '~> 3.11'
 
-gem 'graphql'
-gem 'jwt'
+gem 'graphql', '~> 1.9.14'
+gem 'jwt', '~> 2.2.1'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.7'
 # Use Redis adapter to run Action Cable in production
@@ -38,7 +38,9 @@ group :development do
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
 
-  gem 'faker'
+  # gem 'faker'
+  gem 'rubocop', '~> 0.75.1'
+  gem 'rubocop-rails_config', '~> 0.7.3'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

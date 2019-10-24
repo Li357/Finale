@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Final < ApplicationRecord
   belongs_to :course
 

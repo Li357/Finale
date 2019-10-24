@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Types
   class Course < BaseObject
     description "Course with many finals during different mods"

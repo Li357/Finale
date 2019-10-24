@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Types
   class Final < BaseObject
     description "Final of one Course during a specific mod"

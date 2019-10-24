@@ -1,4 +1,6 @@
-require 'jwt'
+# frozen_string_literal: true
+
+require "jwt"
 
 module Mutations
   class Login < Mutations::BaseMutation

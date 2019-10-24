@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Student < ApplicationRecord
   self.primary_key = :user_id
   belongs_to :user

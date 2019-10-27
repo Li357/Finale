@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Types
-  class Final < BaseObject
+  class FinalType < Types::BaseObject
     description "Final of one Course during a specific mod"
 
-    field :students, [Student], null: false,
+    field :students, [Types::StudentType], null: false,
       description: "Students signed up for the final"
     field :mod, Integer, null: false,
       description: "Mod the final takes place"

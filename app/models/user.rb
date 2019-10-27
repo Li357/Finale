@@ -4,15 +4,15 @@ class User < ApplicationRecord
   has_many :roles
 
   def student?
-    roles.includes? :student
+    roles.any? { |role| role.student? } 
   end
 
   def teacher?
-    roles.includes? :teacher
+    roles.any? { |role| role.teacher? }
   end
 
   def admin?
-    roles.includes? :admin
+    roles.any? { |role| role.admin? }
   end
 
   def as_student

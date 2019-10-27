@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 module Types
-  class Course < BaseObject
+  class CourseType < Types::BaseObject
     description "Course with many finals during different mods"
 
     field :name, String, null: false,
       description: "Name of the course"
-    field :finals, [Final], null: false,
+    field :finals, [Types::FinalType], null: false,
       description: "List of finals available for the course"
   end
 end

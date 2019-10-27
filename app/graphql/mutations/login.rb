@@ -8,7 +8,6 @@ module Mutations
     argument :password, String, required: true
 
     field :token, String, null: false
-    field :errors, [Types::UserError], null: false
 
     def resolve(username:, password:)
       user = User.where(username: username)

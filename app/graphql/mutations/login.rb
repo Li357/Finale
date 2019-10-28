@@ -1,21 +1,29 @@
 # frozen_string_literal: true
 
-require "jwt"
-
 module Mutations
   class Login < Mutations::BaseMutation
+    SCHOOL_LOGIN_URI = URI("https://westside-web.azurewebsites.net/account/login")
+
     argument :username, String, required: true
     argument :password, String, required: true
 
     field :token, String, null: false
 
     def resolve(username:, password:)
-      user = User.where(username: username)
-      failed_response = { error: [ message: "Authentication failed. Incorrect username or password" ] }
+      user = User.find_by(username: username)
+      raise Errors::AuthenticationFailureError unless user
 
-      return failed_response unless user.exists?
+      response = Net::HTTP.post(SCHOOL_LOGIN_URI, "username=#{username}&password=#{password}")
+      # School login endpoint returns 301 status if successful, otherwise 200
+      raise Errors::AuthenticationFailureError unless response.kind_of? Net::HTTPFound
 
-      # TODO: request to school website, if good, sign JWT token
+      payload = {
+        id: user.id,
+        roles: user.roles.map { |role| role.role_type },
+        exp: 1.day.from_now.to_i,
+      }
+      token = JWT.encode(payload, Rails.application.secrets.secret_key_base)
+      { token: token }
     end
   end
 end

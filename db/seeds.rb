@@ -4,7 +4,7 @@ teacher = User.create(
 )
 
 student = User.create(
-  username: 'Doe456', first_name: 'Jane', middle_name: 'M.', last_name: 'Doe', suffix: 'Jr.',
+  username: 'Li357', first_name: 'Andrew', middle_name: '', last_name: 'Li', suffix: '',
   profile_photo: 'https://example.com/student.jpg'
 )
 

@@ -2,17 +2,10 @@
 
 module Types
   class QueryType < Types::BaseObject
-    field :user, [Types::UserType], null: false do
-      argument :id, Integer, required: true
-    end
+    field :user, Types::UserType, null: true
 
-    def user(id:)
-      user = User.find(id)
-      if user.teacher?
-        user.as_teacher
-      else
-        user.as_student
-      end
+    def user
+      User.as_role(context[:current_user])
     end
   end
 end

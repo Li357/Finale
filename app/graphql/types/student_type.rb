@@ -12,7 +12,7 @@ module Types
       description: "List of student's courses"
     field :finals, [Types::FinalType], null: false,
       description: "List of student's finals they've signed up for"
-  
+
     def name
       [object.first_name, object.middle_name, object.last_name, object.suffix] * " "
     end

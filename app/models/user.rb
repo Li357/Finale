@@ -4,7 +4,7 @@ class User < ApplicationRecord
   has_many :roles
 
   def student?
-    roles.any? { |role| role.student? } 
+    roles.any? { |role| role.student? }
   end
 
   def teacher?
@@ -15,18 +15,13 @@ class User < ApplicationRecord
     roles.any? { |role| role.admin? }
   end
 
-  def as_student
-    raise TypeError, "User is not a Student!" unless student?
-    Student.find(id)
-  end
-
-  def as_teacher
-    raise TypeError, "User is not a Teacher" unless teacher?
-    Teacher.find(id)
-  end
-
-  def as_admin
-    raise TypeError, "User is not an Admin" unless admin?
-    Admin.find(id)
+  # Admin model is never really used, only for authorization for admin functionsm, only teachers will be admins
+  def self.as_role(user)
+    return unless user
+    if user.teacher?
+      Teacher.find_by(id: user.id)
+    elsif user.student?
+      Student.find_by(id: user.id)
+    end
   end
 end

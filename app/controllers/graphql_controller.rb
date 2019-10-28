@@ -6,8 +6,7 @@ class GraphqlController < ApplicationController
     query = params[:query]
     operation_name = params[:operationName]
     context = {
-      # Query context goes here, for example:
-      # current_user: current_user,
+      current_user: current_user,
     }
     result = FinaleSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result
@@ -17,6 +16,15 @@ class GraphqlController < ApplicationController
   end
 
   private
+    def current_user
+      return unless headers["Authentication"]
+      token = headers["Authorization"].split(" ").last
+      payload = JWT.decode(token, Rails.application.secrets.secret_key_base).first
+      User.find_by(id: payload.id)
+    rescue ActiveSupport::MessageVerifier::InvalidSignature, JWT::DecodeError, JWT::VerificationError, JWT::ExpiredSignature
+      nil
+    end
+
     # Handle form data, JSON body, or a blank value
     def ensure_hash(ambiguous_param)
       case ambiguous_param

@@ -4,5 +4,10 @@ class CreateTeachers < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+
+    create_table :teachers_courses do |t|
+
+      t.timestamps
+    end
   end
 end

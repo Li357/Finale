@@ -5,7 +5,8 @@ module Types
     field :user, Types::UserType, null: true
 
     def user
-      User.as_role(context[:current_user])
+      return if context[:current_user].nil?
+      context[:current_user].to_role
     end
   end
 end

@@ -7,5 +7,10 @@ class CreateFinals < ActiveRecord::Migration[6.0]
 
       t.timestamps
     end
+
+    create_table :finals_students do |t|
+      
+      t.timestamps
+    end
   end
 end

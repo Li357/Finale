@@ -2,7 +2,5 @@
 
 class Final < ApplicationRecord
   belongs_to :course
-
-  has_many :final_signups
-  has_many :students, through: :final_signups
+  has_and_belongs_to_many :students
 end

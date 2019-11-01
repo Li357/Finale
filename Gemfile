@@ -40,6 +40,9 @@ group :development do
   gem "spring"
   gem "spring-watcher-listen", "~> 2.0.0"
 
+  gem 'sprockets', '~> 3'
+  gem "graphiql-rails"
+
   # gem "faker"
   gem "rubocop", "~> 0.75.1"
   gem "rubocop-rails_config", "~> 0.7.3"

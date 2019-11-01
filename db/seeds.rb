@@ -8,8 +8,10 @@ student = User.create(
   profile_photo: 'https://example.com/student.jpg'
 )
 
-Role.create(user_id: student.id, role_type: 0)
-Role.create(user_id: teacher.id, role_type: 1)
+department = Department.create(name: 'Mathematics')
 
-Student.create(id: student.id)
-Teacher.create(id: teacher.id)
+Role.create(user: student, role_type: :student)
+Role.create(user: teacher, role_type: :teacher)
+
+Student.create(user: student)
+Teacher.create(user: teacher, department: department)

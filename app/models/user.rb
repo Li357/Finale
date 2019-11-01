@@ -16,12 +16,21 @@ class User < ApplicationRecord
   end
 
   # Admin model is never really used, only for authorization for admin functionsm, only teachers will be admins
-  def self.as_role(user)
-    return unless user
-    if user.teacher?
-      Teacher.find_by(id: user.id)
-    elsif user.student?
-      Student.find_by(id: user.id)
+  def to_role
+    if teacher?
+      Teacher.joins(:user).find_by(user_id: id)
+    else
+      Student.joins(:user).find_by(user_id: id)
     end
+  end
+
+  def name
+    [first_name, middle_name, last_name, suffix]
+      .reject { |c| c.empty? }
+      .join(" ")
+  end
+
+  def photo
+    profile_photo
   end
 end

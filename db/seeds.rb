@@ -9,9 +9,10 @@ student = User.create(
 )
 
 department = Department.create(name: 'Mathematics')
+algebra = Course.create(name: 'Algebra', department: department)
 
 Role.create(user: student, role_type: :student)
 Role.create(user: teacher, role_type: :teacher)
 
-Student.create(user: student)
-Teacher.create(user: teacher, department: department)
+Student.create(user: student, courses: [algebra])
+Teacher.create(user: teacher, department: department, courses: [algebra])

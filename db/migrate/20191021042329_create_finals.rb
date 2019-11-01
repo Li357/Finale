@@ -8,7 +8,7 @@ class CreateFinals < ActiveRecord::Migration[6.0]
       t.timestamps
     end
 
-    create_table :finals_students do |t|
+    create_table :students_finals do |t|
       
       t.timestamps
     end

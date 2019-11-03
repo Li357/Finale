@@ -3,25 +3,13 @@
 class User < ApplicationRecord
   has_many :roles
 
-  def student?
-    roles.any? { |role| role.student? }
-  end
-
-  def teacher?
-    roles.any? { |role| role.teacher? }
-  end
-
-  def admin?
-    roles.any? { |role| role.admin? }
+  def has_roles?(role_types)
+    roles.all? { |role| role_types.include?(role.role_type.to_sym) }
   end
 
   # Admin model is never really used, only for authorization for admin functionsm, only teachers will be admins
   def to_role
-    if teacher?
-      Teacher.joins(:user).find_by(user_id: id)
-    else
-      Student.joins(:user).find_by(user_id: id)
-    end
+    has_roles?([:teacher]) ? Teacher.joins(:user).find_by(user_id: id) : Student.joins(:user).find_by(user_id: id)
   end
 
   def name

@@ -11,11 +11,11 @@ module Mutations
 
     def resolve(username:, password:)
       user = User.find_by(username: username)
-      raise Errors::AuthenticationFailureError unless !user.nil?
+      raise Errors::AuthenticationFailureError if user.nil?
 
       response = Net::HTTP.post(SCHOOL_LOGIN_URI, "username=#{username}&password=#{password}")
       # School login endpoint returns 301 status if successful, otherwise 200
-      raise Errors::AuthenticationFailureError unless response.kind_of? Net::HTTPFound
+      raise Errors::AuthenticationFailureError unless response.kind_of?(Net::HTTPFound)
 
       payload = {
         id: user.id,

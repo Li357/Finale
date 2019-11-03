@@ -1,9 +1,9 @@
-teacher = User.create(
+teacherUser = User.create(
   username: 'Smith123', first_name: 'John', middle_name: '', last_name: 'Smith', suffix: '',
   profile_photo: 'https://example.com/teacher.jpg'
 )
 
-student = User.create(
+studentUser = User.create(
   username: 'Li357', first_name: 'Andrew', middle_name: '', last_name: 'Li', suffix: '',
   profile_photo: 'https://example.com/student.jpg'
 )
@@ -11,8 +11,11 @@ student = User.create(
 department = Department.create(name: 'Mathematics')
 algebra = Course.create(name: 'Algebra', department: department)
 
-Role.create(user: student, role_type: :student)
-Role.create(user: teacher, role_type: :teacher)
+Role.create(user: studentUser, role_type: :student)
+Role.create(user: teacherUser, role_type: :teacher)
 
-Student.create(user: student, courses: [algebra])
-Teacher.create(user: teacher, department: department, courses: [algebra])
+student = Student.create(user: studentUser, courses: [algebra])
+Teacher.create(user: teacherUser, department: department, courses: [algebra])
+
+capacity = 15
+Final.create(course: algebra, students: [student], mod: 1, capacity: capacity, room: 'Rm. 325')

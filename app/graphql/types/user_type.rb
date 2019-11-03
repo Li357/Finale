@@ -21,11 +21,7 @@ module Types::UserType
 
   definition_methods do
     def resolve_type(object, context)
-      !context[:current_user].nil? && context[:current_user].teacher? ? Types::TeacherType : Types::StudentType
-    end
-
-    def authorized?(object, context)
-      super && !context[:current_user].nil?
+      context[:current_user].has_roles?([:teacher]) ? Types::TeacherType : Types::StudentType
     end
   end
 end

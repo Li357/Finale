@@ -19,8 +19,8 @@ class GraphqlController < ApplicationController
     def current_user
       return unless request.headers.include?("Authorization")
       token = request.headers["Authorization"].split(" ").last
-      payload = HashWithIndifferentAccess.new(JWT.decode(token, Rails.application.secrets.secret_key_base).first)
-      User.find_by(id: payload[:id])
+      payload = JWT.decode(token, Rails.application.secrets.secret_key_base).first
+      User.find_by(id: payload["id"])
     rescue ActiveSupport::MessageVerifier::InvalidSignature, JWT::DecodeError, JWT::VerificationError, JWT::ExpiredSignature
       nil
     end

@@ -2,10 +2,9 @@
 
 module Types
   class QueryType < Types::BaseObject
-    field :user, Types::UserType, null: true
+    field :user, Types::UserType, null: true, auth: [:student, :teacher]
 
     def user
-      return if context[:current_user].nil?
       context[:current_user].to_role
     end
   end

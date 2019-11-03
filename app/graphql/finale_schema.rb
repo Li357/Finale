@@ -7,4 +7,8 @@ class FinaleSchema < GraphQL::Schema
   def self.unauthorized_object(error)
     raise Errors::NotAuthorizedError
   end
+
+  def self.unauthorized_field(error)
+    raise Errors::NotAuthorizedError
+  end
 end

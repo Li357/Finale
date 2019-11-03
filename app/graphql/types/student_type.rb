@@ -5,9 +5,9 @@ module Types
     implements Types::UserType
     description "Student"
 
-    field :courses, [Types::CourseType], null: false,
+    field :courses, [Types::CourseType], null: false, auth: [:student],
       description: "List of student's courses"
-    field :finals, [Types::FinalType], null: false,
+    field :finals, [Types::FinalType], null: false, auth: [:student],
       description: "List of student's finals they've signed up for"
 
     def courses

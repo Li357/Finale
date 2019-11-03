@@ -55,15 +55,6 @@ ActiveRecord::Schema.define(version: 2019_11_03_005146) do
     t.index ["teacher_id"], name: "index_finals_on_teacher_id"
   end
 
-  create_table "finals_students", force: :cascade do |t|
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.bigint "student_id", null: false
-    t.bigint "final_id", null: false
-    t.index ["final_id"], name: "index_finals_students_on_final_id"
-    t.index ["student_id"], name: "index_finals_students_on_student_id"
-  end
-
   create_table "roles", force: :cascade do |t|
     t.integer "role_type"
     t.datetime "created_at", precision: 6, null: false
@@ -89,8 +80,6 @@ ActiveRecord::Schema.define(version: 2019_11_03_005146) do
   create_table "teachers", primary_key: "user_id", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "department_id", null: false
-    t.index ["department_id"], name: "index_teachers_on_department_id"
   end
 
   create_table "teachers_courses", force: :cascade do |t|
@@ -100,6 +89,15 @@ ActiveRecord::Schema.define(version: 2019_11_03_005146) do
     t.bigint "course_id", null: false
     t.index ["course_id"], name: "index_teachers_courses_on_course_id"
     t.index ["teacher_id"], name: "index_teachers_courses_on_teacher_id"
+  end
+
+  create_table "teachers_departments", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "teacher_id", null: false
+    t.bigint "department_id", null: false
+    t.index ["department_id"], name: "index_teachers_departments_on_department_id"
+    t.index ["teacher_id"], name: "index_teachers_departments_on_teacher_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -118,12 +116,11 @@ ActiveRecord::Schema.define(version: 2019_11_03_005146) do
   add_foreign_key "final_signups", "students", primary_key: "user_id"
   add_foreign_key "finals", "courses"
   add_foreign_key "finals", "teachers", primary_key: "user_id"
-  add_foreign_key "finals_students", "finals"
-  add_foreign_key "finals_students", "students", primary_key: "user_id"
   add_foreign_key "roles", "users"
   add_foreign_key "students_courses", "courses"
   add_foreign_key "students_courses", "students", primary_key: "user_id"
-  add_foreign_key "teachers", "departments"
   add_foreign_key "teachers_courses", "courses"
   add_foreign_key "teachers_courses", "teachers", primary_key: "user_id"
+  add_foreign_key "teachers_departments", "departments"
+  add_foreign_key "teachers_departments", "teachers", primary_key: "user_id"
 end

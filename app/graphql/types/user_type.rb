@@ -12,16 +12,16 @@ module Types::UserType
   orphan_types Types::StudentType, Types::TeacherType
 
   def name
-    context[:current_user].name
+    object.user.name
   end
 
   def photo
-    context[:current_user].photo
+    object.user.photo
   end
 
   definition_methods do
     def resolve_type(object, context)
-      context[:current_user].has_roles?([:teacher]) ? Types::TeacherType : Types::StudentType
+      object.user.has_roles?([:teacher]) ? Types::TeacherType : Types::StudentType
     end
   end
 end

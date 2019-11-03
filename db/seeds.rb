@@ -17,5 +17,6 @@ Role.create(user: teacherUser, role_type: :teacher)
 student = Student.create(user: studentUser, courses: [algebra])
 teacher = Teacher.create(user: teacherUser, departments: [department], courses: [algebra])
 
-capacity = 15
-Final.create(supervisor: teacher, course: algebra, students: [student], mod: 1, capacity: capacity, room: 'Rm. 325')
+final = Final.create(supervisor: teacher, course: algebra, students: [student], mod: 1, capacity: 15, room: 'Rm. 325')
+teacher.finals << final
+teacher.save!

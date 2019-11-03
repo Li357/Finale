@@ -3,6 +3,8 @@
 class User < ApplicationRecord
   has_many :roles
 
+  validates :username, :first_name, :last_name, presence: true
+
   def has_roles?(role_types)
     roles.all? { |role| role_types.include?(role.role_type.to_sym) }
   end

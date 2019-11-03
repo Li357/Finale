@@ -2,5 +2,5 @@
 
 class Department < ApplicationRecord
   has_many :courses
-  has_many :teachers
+  has_and_belongs_to_many :teachers
 end

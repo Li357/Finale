@@ -3,6 +3,7 @@
 class Teacher < ApplicationRecord
   self.primary_key = :user_id
   belongs_to :user
-  belongs_to :department
+  has_and_belongs_to_many :departments, join_table: :teachers_departments
   has_and_belongs_to_many :courses, join_table: :teachers_courses
+  has_many :finals
 end

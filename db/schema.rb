@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_01_044115) do
+ActiveRecord::Schema.define(version: 2019_11_03_005146) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -50,7 +50,9 @@ ActiveRecord::Schema.define(version: 2019_11_01_044115) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "course_id", null: false
+    t.bigint "teacher_id", null: false
     t.index ["course_id"], name: "index_finals_on_course_id"
+    t.index ["teacher_id"], name: "index_finals_on_teacher_id"
   end
 
   create_table "finals_students", force: :cascade do |t|
@@ -115,6 +117,7 @@ ActiveRecord::Schema.define(version: 2019_11_01_044115) do
   add_foreign_key "final_signups", "finals"
   add_foreign_key "final_signups", "students", primary_key: "user_id"
   add_foreign_key "finals", "courses"
+  add_foreign_key "finals", "teachers", primary_key: "user_id"
   add_foreign_key "finals_students", "finals"
   add_foreign_key "finals_students", "students", primary_key: "user_id"
   add_foreign_key "roles", "users"

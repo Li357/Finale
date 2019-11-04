@@ -9,13 +9,5 @@ module Types
       description: "List of student's courses"
     field :finals, [Types::FinalType], null: false, auth: [:student],
       description: "List of student's finals they've signed up for"
-
-    def courses
-      object.attended_courses
-    end
-
-    def finals
-      object.registered_finals
-    end
   end
 end

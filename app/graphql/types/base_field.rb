@@ -10,7 +10,7 @@ module Types
     end
 
     def authorized?(object, context)
-      @auth.include?(:none) || (!context[:current_user].nil? && context[:current_user].has_roles?(@auth))
+      @auth.include?(:none) || (!context[:current_user].nil? && context[:current_user].user.has_roles?(@auth))
     end
 
     def resolve_field(obj, args, ctx)

@@ -19,4 +19,4 @@ teacher = Teacher.create(user: teacherUser, departments: [department], courses: 
 
 final = Final.create(supervisor: teacher, course: algebra, students: [student], mod: 1, capacity: 15, room: 'Rm. 325')
 teacher.finals << final
-teacher.save!
+teacher.save

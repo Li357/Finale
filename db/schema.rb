@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_11_03_005146) do
+ActiveRecord::Schema.define(version: 2019_11_03_224609) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,15 +32,6 @@ ActiveRecord::Schema.define(version: 2019_11_03_005146) do
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "final_signups", force: :cascade do |t|
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.bigint "student_id", null: false
-    t.bigint "final_id", null: false
-    t.index ["final_id"], name: "index_final_signups_on_final_id"
-    t.index ["student_id"], name: "index_final_signups_on_student_id"
   end
 
   create_table "finals", force: :cascade do |t|
@@ -75,6 +66,16 @@ ActiveRecord::Schema.define(version: 2019_11_03_005146) do
     t.bigint "course_id", null: false
     t.index ["course_id"], name: "index_students_courses_on_course_id"
     t.index ["student_id"], name: "index_students_courses_on_student_id"
+  end
+
+  create_table "students_finals", force: :cascade do |t|
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.bigint "student_id", null: false
+    t.bigint "final_id", null: false
+    t.index ["final_id"], name: "index_students_finals_on_final_id"
+    t.index ["student_id", "final_id"], name: "index_students_finals_on_student_id_and_final_id", unique: true
+    t.index ["student_id"], name: "index_students_finals_on_student_id"
   end
 
   create_table "teachers", primary_key: "user_id", force: :cascade do |t|
@@ -112,13 +113,13 @@ ActiveRecord::Schema.define(version: 2019_11_03_005146) do
   end
 
   add_foreign_key "courses", "departments"
-  add_foreign_key "final_signups", "finals"
-  add_foreign_key "final_signups", "students", primary_key: "user_id"
   add_foreign_key "finals", "courses"
   add_foreign_key "finals", "teachers", primary_key: "user_id"
   add_foreign_key "roles", "users"
   add_foreign_key "students_courses", "courses"
   add_foreign_key "students_courses", "students", primary_key: "user_id"
+  add_foreign_key "students_finals", "finals"
+  add_foreign_key "students_finals", "students", primary_key: "user_id"
   add_foreign_key "teachers_courses", "courses"
   add_foreign_key "teachers_courses", "teachers", primary_key: "user_id"
   add_foreign_key "teachers_departments", "departments"

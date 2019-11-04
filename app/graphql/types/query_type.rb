@@ -5,7 +5,7 @@ module Types
     field :user, Types::UserType, null: true, auth: [:student, :teacher]
 
     def user
-      context[:current_user].to_role
+      context[:current_user]
     end
   end
 end

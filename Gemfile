@@ -13,11 +13,12 @@ gem "pg", ">= 0.18", "< 2.0"
 gem "puma", "~> 3.11"
 
 gem "graphql", "~> 1.9.14"
+gem "graphql-extras", "~> 0.2.4"
 gem "jwt", "~> 2.2.1"
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem "jbuilder", "~> 2.7"
 # Use Redis adapter to run Action Cable in production
-# gem "redis", "~> 4.0"
+gem "redis", "~> 4.0"
 gem "bcrypt", "~> 3.1.7"
 
 # Use Active Storage variant

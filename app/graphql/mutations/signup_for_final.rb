@@ -2,21 +2,22 @@
 
 module Mutations
   class SignupForFinal < Mutations::BaseMutation
+    include Helpers::Authorization
+
+    description "Signup for a final"
+
     argument :id, Integer, required: true
 
     field :final, Types::FinalType, null: true
 
     def resolve(id:)
-      final = Final.find_by(id: id)
-      attends_course = context[:current_user].courses.any? { |course| course.id == final.course.id }
-      raise Errors::NotAuthorizedError unless attends_course
-
-      begin
-        modified = final.signup(context[:current_user])
+      final = can_view_final!(context[:current_user], Final.find_by(id: id))
+      final.signup(context[:current_user]) { |modified|
+        FinaleSchema.subscriptions.trigger(:signed_up_for_final, { id: id }, modified)
         { final: modified }
-      rescue ActiveRecord::RecordNotUnique
-        raise Errors::DuplicateError, "Cannot sign up for final twice!"
-      end
+      }
+    rescue ActiveRecord::RecordNotUnique
+      raise Errors::DuplicateError, "Cannot sign up for final twice!"
     end
   end
 end

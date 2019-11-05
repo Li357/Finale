@@ -4,6 +4,8 @@ module Mutations
   class Login < Mutations::BaseMutation
     SCHOOL_LOGIN_URI = URI("https://westside-web.azurewebsites.net/account/login")
 
+    description "Login with username and password"
+
     argument :username, String, required: true
     argument :password, String, required: true
 

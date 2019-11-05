@@ -2,6 +2,8 @@
 
 module Types
   class BaseField < GraphQL::Schema::Field
+    include GraphQL::Extras::Types
+
     argument_class BaseArgument
 
     def initialize(*args, auth: [:none], **kwargs, &block)

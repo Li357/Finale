@@ -13,9 +13,8 @@ class Final < ApplicationRecord
     students.length
   end
 
-  def signup(student)
+  def signup(student, &block)
     students << student
-    save
-    self
+    save(&block)
   end
 end

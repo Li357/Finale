@@ -24,7 +24,7 @@ module Mutations
         roles: user.roles.map { |role| role.role_type },
         exp: 1.day.from_now.to_i,
       }
-      token = JWT.encode(payload, Rails.application.secrets.secret_key_base)
+      token = JWT.encode(payload, Rails.application.credentials.secret_key_base)
       { token: token }
     end
   end

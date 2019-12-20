@@ -3,7 +3,9 @@
 class Teacher < ApplicationRecord
   self.primary_key = :user_id
   belongs_to :user
-  has_and_belongs_to_many :departments, join_table: :teachers_departments
-  has_and_belongs_to_many :courses, join_table: :teachers_courses
-  has_many :finals, inverse_of: :supervisor
+  has_many :department_assignments
+  has_many :departments, through: :department_assignments
+  has_many :teacher_course_registrations
+  has_many :courses, through: :teacher_course_registrations
+  has_and_belongs_to_many :finals, join_table: :teacher_final_assignments
 end

@@ -2,7 +2,8 @@
 
 class Department < ApplicationRecord
   has_many :courses
-  has_and_belongs_to_many :teachers
+  has_many :department_assignments
+  has_many :teachers, through: :department_assignments
 
   validates :name, presence: true
 end

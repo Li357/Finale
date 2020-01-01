@@ -1,0 +1,38 @@
+.login {
+  --info-margin-vertical: 30px;
+}
+
+.login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  width: 350px;
+}
+
+.logo {
+  align-self: center;
+  width: 60%;
+  height: auto;
+}
+
+.login-container > h1.text-title {
+  margin-top: var(--info-margin-vertical);
+  margin-bottom: 5px;
+}
+
+.login-container > span.text-body {
+  margin-bottom: var(--info-margin-vertical);
+}
+
+.login-container > input {
+  margin-bottom: 10px;
+}
+
+.login-container > button {
+  align-self: flex-start;
+}

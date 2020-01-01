@@ -1,5 +1,5 @@
 input {
-  padding: 15px 20px;
+  padding: var(--form-margin-vertical) 15px;
   border-radius: 30px;
   border: var(--border);
 }

@@ -16,10 +16,9 @@ class ImportSchoolDataJob < ApplicationJob
     }
     @DB = Sequel.connect(db_conn_opts)
 
-    import_courses
     import_students
-    import_teachers_and_departments
-    # set_admins
+    import_departments
+    import_teachers_and_admins
 
     @DB.disconnect
   end
@@ -48,23 +47,35 @@ class ImportSchoolDataJob < ApplicationJob
   end
 
   def import_students
-    users = []
-    roles = []
-    students = []
+    query = <<~SQL
+      SELECT UserName, FirstName, MiddleName, LastName, Suffix, ProfilePictureUri FROM (
+        SELECT 
+          UserName,
+          MAX(CASE WHEN [Type] like '%Id' then [Value] end) as StudentId,
+          MAX(CASE WHEN [Value] = 'student' then 1 else 0 end) as Student
+        FROM UserClaims
+        INNER JOIN Users ON UserClaims.UserId = Users.Id
+        WHERE Type LIKE '%Id' OR Type LIKE '%role'
+        GROUP BY UserName
+      ) src
+      INNER JOIN Students ON Students.Id = StudentId
+      WHERE Student = 1 and [Deleted] = 0;
+    SQL
 
-    @DB[:Students]
-      .select(:FirstName, :MiddleName, :LastName, :Suffix, :ProfilePictureUri)
-      .where(Deleted: 0)
-      .each do |student|
-        user = User.new(
-          username: 'TODO',
-          first_name: student[:FirstName], middle_name: student[:MiddleName], last_name: student[:LastName], suffix: student[:Suffix],
-          profile_photo: student[:profilepictureuri],
-        )
-        roles << Role.new(user: user, role_type: :student)
-        students << Student.new(user: user)
-        users << user
-      end
+    users = []
+    students = []
+    roles = []
+
+    @DB[query].each do |row|
+      user = User.new(
+        username: row[:UserName],
+        first_name: row[:FirstName], middle_name: row[:MiddleName], last_name: row[:LastName], suffix: row[:Suffix],
+        profile_photo: row[:ProfilePictureUri],
+      )
+      roles << Role.new(user: user, role_type: :student)
+      students << Student.new(user: user)
+      users << user
+    end
 
     Student.transaction do
       User.import(users)
@@ -73,12 +84,8 @@ class ImportSchoolDataJob < ApplicationJob
     end
   end
 
-  def import_teachers_and_departments
+  def import_departments
     departments = []
-    users = []
-    roles = []
-    teachers = []
-    department_assignments = []
 
     @DB[:Departments]
       .select(:Id, :Name)
@@ -87,28 +94,63 @@ class ImportSchoolDataJob < ApplicationJob
         departments << Department.new(id: department[:Id], name: department[:Name])
       end
 
-    @DB[:teachers]
-      .select(:DepartmentId, :FirstName, :LastName, :ProfilePictureUri)
-      .where(Deleted: 0)
-      .each do |teacher|
-        user = User.new(
-          username: 'TODO',
-          first_name: teacher[:firstname], middle_name: '', last_name: teacher[:lastname], suffix: '',
-          profile_photo: teacher[:profilepictureuri],
-        )
+    Department.import(departments)
+  end
+
+  def import_teachers_and_admins
+    # User can either be one of teacher or admin or both
+    # If a user is not a teacher but an admin, they still have a teacher id in the Teacher table with info
+    teacher_query = <<~SQL
+      SELECT UserName, FirstName, LastName, ProfilePictureUri, Teacher, DepartmentId, [Admin] FROM (
+        SELECT 
+          UserName,
+          MAX(CASE WHEN [Type] like '%Id' then [Value] end) as TeacherId,
+          MAX(CASE WHEN [Value] = 'teacher' then 1 else 0 end) as Teacher,
+          MAX(CASE WHEN [Value] = 'admin' then 1 else 0) as [Admin]
+        FROM UserClaims
+        INNER JOIN Users ON UserClaims.UserId = Users.Id
+        WHERE [Type] LIKE '%Id' OR [Type] LIKE '%role'
+        GROUP BY UserName
+      ) src
+      INNER JOIN Teachers ON Teachers.Id = TeacherId
+      WHERE (Teacher = 1 or [Admin] = 1) and [Deleted] = 0;
+    SQL
+
+    users = []
+    roles = []
+    teachers = []
+    department_assignments = []
+    admins = []
+
+    @DB[teacher_query].each do |row|
+      user = User.new(
+        username: row[:UserName],
+        first_name: row[:FirstName], middle_name: '', last_name: row[:LastName], suffix: '',
+        profile_photo: row[:ProfilePictureUri],
+      )
+
+      if row[:Teacher]
         teacher = Teacher.new(user: user)
         roles << Role.new(user: user, role_type: :teacher)
         teachers << teacher
-        department_assignments << DepartmentAssignment.new(teacher_id: teacher[:Id], department_id: teacher[:DepartmentId])
-        users << user
+        # Association is Finale's Teacher ID --> School's Department ID
+        department_assignments << DepartmentAssignment.new(teacher_id: teacher[:Id], department_id: row[:DepartmentId])
       end
+
+      # Those exclusively admins do not have department info saved since they will never need to supervise finals
+      if row[:Admin]
+        admins << Admin.new(user: user)
+        roles << Role.new(user: user, role_type: :admin)
+      end
+      users << user
+    end
 
     Teacher.transaction do
       User.import(users)
       Role.import(roles)
-      Department.import(departments)
       Teacher.import(teachers)
       DepartmentAssignment.import(department_assignments)
+      Admin.import(admins)
     end
   end
 end

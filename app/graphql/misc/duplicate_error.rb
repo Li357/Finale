@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Errors
-  class DuplicateError < GraphQL::ExecutionError
+  class Duplicate < GraphQL::ExecutionError
     def extensions
       { code: "DUPLICATE" }
     end

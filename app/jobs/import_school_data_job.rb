@@ -3,6 +3,11 @@
 require "sequel"
 require "tiny_tds"
 
+# TODO: Fix symbols not working here...
+STUDENT = 0
+TEACHER = 1
+ADMIN = 2
+
 class ImportSchoolDataJob < ApplicationJob
   queue_as :urgent
 
@@ -18,65 +23,84 @@ class ImportSchoolDataJob < ApplicationJob
     }
     @DB = Sequel.connect(db_conn_opts)
 
-    import_students
-    import_departments
-    import_teachers_and_admins
-    import_courses
-
+    begin
+      puts "Importing students..."
+      import_students
+      puts "Importing departments..."
+      import_departments
+      puts "Importing teachers and admins..."
+      import_teachers_and_admins
+      puts "Importing courses..."
+      import_courses
+      puts "All done!"
+    rescue Sequel::DatabaseError => error
+      puts "Error: #{error}"
+    end
     @DB.disconnect
   end
 
   def import_courses
-    today = Date.today
+    today = Date.today.strftime("%F")
+    students_courses_query = <<~SQL
+      SELECT
+        Students.Id AS student_id,
+        Courses.Id AS course_id,
+        Courses.Name AS course_name,
+        Courses.DepartmentId AS course_department
+      FROM EnrollmentRecords ER
+      INNER JOIN Courses ON ER.CourseId = Courses.Id
+      INNER JOIN Semesters S ON ER.SemesterId = S.Id
+      INNER JOIN Students ON ER.StudentId = Students.Id
+      WHERE Students.[Deleted] = 0 AND S.StartDate <= ? AND ? <= S.EndDate
+    SQL
 
+    seen_courses = {}
     courses = []
     students_courses = []
-    @DB[:EnrollmentRecords]
-      .select(Sequel.lit(<<~SQL))
-        Students.Id AS StudentId,
-        Courses.Id AS CourseId,
-        Courses.Name AS CourseName,
-        Courses.DepartmentId AS CourseDepartment
-      SQL
-      .join(:Courses, Id: :CourseId)
-      .join(:Semesters, Id: :SemesterId)
-      .join(:Students, Id: :StudentId)
-      .where(Sequel.lit("Students.[Deleted] = 0 AND StartDate <= ? AND ? <= EndDate", today))
-      .each do |row|
-        courses << Course.new(id: row[:CourseId], name: row[:CourseName], department_id: row[:CourseDepartment])
-        students_courses << StudentCourseRegistration.new(student_id: row[:StudentId], course_id: row[:CourseId])
+    @DB[students_courses_query, today, today].each do |row|
+      course_id = row[:course_id]
+      if !seen_courses.key?(course_id) # The courses are inserted on a need-basis, only the courses with active students are inserted to save space
+        courses << { id: course_id, name: row[:course_name], department_id: row[:course_department] }
+        seen_courses[course_id] = 1
       end
+      students_courses << { student_id: row[:student_id], course_id: row[:course_id] }
+    end
+
+    teachers_courses_query = <<~SQL
+      SELECT DISTINCT Teachers.Id AS teacher_id, Courses.Id AS course_id
+      FROM TeacherScheduledMeetings TSM
+      INNER JOIN Teachers ON TSM.TeacherId = Teachers.Id
+      INNER JOIN ScheduledMeetings SM ON TSM.ScheduledMeetingId = SM.Id
+      INNER JOIN Courses ON SM.CourseId = Courses.Id
+      INNER JOIN Semesters S on SM.SemesterId = S.Id
+      WHERE Teachers.[Deleted] = 0 AND S.StartDate <= ? AND ? <= S.EndDate
+    SQL
 
     teachers_courses = []
-    @DB[:TeacherScheduledMeetings]
-      .select(Sequel.lit("DISTINCT Teachers.Id AS TeacherId, Courses.Id AS CourseId"))
-      .join(:Teachers, Id: :TeacherId)
-      .join(:ScheduledMeetings, Id: :ScheduledMeetingId)
-      .join(:Semesters, Id: :SemesterId)
-      .join(:Courses, Id: :CourseId)
-      .where(Sequel.lit("Teachers.[Deleted] = 0 AND StartDate <= ? AND ? <= EndDate", today))
-      .each do |row|
-        teachers_courses << TeacherCourseRegistration.new(teacher_id: row[:TeacherId], course_id: row[:CourseId])
+    @DB[teachers_courses_query, today, today].each do |row|
+      if seen_courses.key?(row[:course_id]) # need to check if the course a teacher teaches is needed, i.e. are there students actually taking it?
+        teachers_courses << { teacher_id: row[:teacher_id], course_id: row[:course_id] }
       end
+    end
 
     Course.transaction do
-      Course.import(courses)
-      StudentCourseRegistration.import(students_courses)
-      TeacherCourseRegistration.import(teachers_courses)
+      Course.insert_all(courses)
+      StudentCourseRegistration.insert_all(students_courses)
+      TeacherCourseRegistration.insert_all(teachers_courses)
     end
   end
 
   def import_students
     query = <<~SQL
-      SELECT UserId, UserName, StudentId, FirstName, MiddleName, LastName, Suffix, ProfilePictureUri FROM (
+      SELECT userid, username, studentid, firstname, middlename, lastname, suffix, profilepictureuri FROM (
         SELECT
           UserId,
           UserName,
-          MAX(CASE WHEN [Type] LIKE "%Id" THEN [Value] END) AS StudentId,
-          MAX(CASE WHEN [Value] = "student" THEN 1 ELSE 0 END) AS Student
+          MAX(CASE WHEN [Type] LIKE '%Id' THEN [Value] END) AS StudentId,
+          MAX(CASE WHEN [Value] = 'student' THEN 1 ELSE 0 END) AS Student
         FROM UserClaims
         INNER JOIN Users ON UserClaims.UserId = Users.Id
-        WHERE [Type] LIKE "%Id" OR [Type] LIKE "%role"
+        WHERE [Type] LIKE '%Id' OR [Type] LIKE '%role'
         GROUP BY UserId, UserName
       ) src
       INNER JOIN Students ON Students.Id = StudentId
@@ -88,21 +112,21 @@ class ImportSchoolDataJob < ApplicationJob
     roles = []
 
     @DB[query].each do |row|
-      user = User.new(
-        id: row[:UserId],
-        username: row[:UserName],
-        first_name: row[:FirstName], middle_name: row[:MiddleName], last_name: row[:LastName], suffix: row[:Suffix],
-        profile_photo: row[:ProfilePictureUri],
-      )
-      roles << Role.new(user: user, role_type: :student)
-      students << Student.new(id: row[:StudentId], user: user)
-      users << user
+      user_id = row[:userid]
+      users << {
+        id: user_id,
+        username: row[:username],
+        first_name: row[:firstname], middle_name: row[:middlename] || '', last_name: row[:lastname], suffix: row[:suffix] || '',
+        profile_photo: row[:profilepictureuri],
+      }
+      roles << { user_id: user_id, role_type: STUDENT }
+      students << { user_id: user_id, id: row[:studentid] }
     end
 
     Student.transaction do
-      User.import(users)
-      Role.import(roles)
-      Student.import(students)
+      User.insert_all(users)
+      Role.insert_all(roles)
+      Student.insert_all(students)
     end
   end
 
@@ -110,33 +134,33 @@ class ImportSchoolDataJob < ApplicationJob
     departments = []
 
     @DB[:Departments]
-      .select(:Id, :Name)
-      .where(Deleted: 0)
+      .select(:id, :name)
+      .where(deleted: 0)
       .each do |department|
-        departments << Department.new(id: department[:Id], name: department[:Name])
+        departments << { id: department[:id], name: department[:name] }
       end
 
-    Department.import(departments)
+    Department.insert_all(departments)
   end
 
   def import_teachers_and_admins
     # User can either be one of teacher or admin or both
     # If a user is not a teacher but an admin, they still have a teacher id in the Teacher table with info
     teacher_query = <<~SQL
-      SELECT UserId, UserName, FirstName, LastName, ProfilePictureUri, TeacherId, DepartmentId, [Admin] FROM (
+      SELECT userid, username, firstname, lastname, profilepictureuri, teacherid, departmentid, teacher, [admin] FROM (
         SELECT
           UserId,
           UserName,
-          MAX(CASE WHEN [Type] LIKE "%Id" THEN [Value] END) AS TeacherId,
-          MAX(CASE WHEN [Value] = "teacher" THEN 1 ELSE 0 END) AS Teacher,
-          MAX(CASE WHEN [Value] = "admin" THEN 1 ELSE 0) AS [Admin]
+          MAX(CASE WHEN [Type] LIKE '%Id' THEN [Value] END) AS TeacherId,
+          MAX(CASE WHEN [Value] = 'teacher' THEN 1 ELSE 0 END) AS Teacher,
+          MAX(CASE WHEN [Value] = 'admin' THEN 1 ELSE 0 END) AS [admin]
         FROM UserClaims
         INNER JOIN Users ON UserClaims.UserId = Users.Id
-        WHERE [Type] LIKE "%Id" OR [Type] LIKE "%role"
+        WHERE [Type] LIKE '%Id' OR [Type] LIKE '%role'
         GROUP BY UserId, UserName
       ) src
       INNER JOIN Teachers ON Teachers.Id = TeacherId
-      WHERE (Teacher = 1 or [Admin] = 1) and [Deleted] = 0;
+      WHERE (Teacher = 1 OR [Admin] = 1) AND [Deleted] = 0;
     SQL
 
     users = []
@@ -146,34 +170,35 @@ class ImportSchoolDataJob < ApplicationJob
     admins = []
 
     @DB[teacher_query].each do |row|
-      user = User.new(
-        id: row[:UserId],
-        username: row[:UserName],
-        first_name: row[:FirstName], middle_name: "", last_name: row[:LastName], suffix: "",
-        profile_photo: row[:ProfilePictureUri],
-      )
+      user_id = row[:userid]
+      teacher_id = row[:teacherid]
+      users << {
+        id: user_id,
+        username: row[:username],
+        first_name: row[:firstname], middle_name: "", last_name: row[:lastname], suffix: "",
+        profile_photo: row[:profilepictureuri],
+      }
 
-      if row[:Teacher]
-        roles << Role.new(user: user, role_type: :teacher)
-        teachers << Teacher.new(id: row[:TeacherId], user: user)
+      if row[:teacher]
+        roles << { user_id: user_id, role_type: TEACHER }
+        teachers << { id: teacher_id, user_id: user_id }
         # Association is Finale's Teacher ID --> School's Department ID
-        department_assignments << DepartmentAssignment.new(teacher_id: row[:TeacherId], department_id: row[:DepartmentId])
+        department_assignments << { teacher_id: teacher_id, department_id: row[:departmentid] }
       end
 
       # Those exclusively admins do not have department info saved since they will never need to supervise finals
-      if row[:Admin]
-        admins << Admin.new(id: row[:TeacherId], user: user)
-        roles << Role.new(user: user, role_type: :admin)
+      if row[:admin]
+        admins << { id: teacher_id, user_id: user_id }
+        roles << { user_id: user_id, role_type: ADMIN }
       end
-      users << user
     end
 
     Teacher.transaction do
-      User.import(users)
-      Role.import(roles)
-      Teacher.import(teachers)
-      DepartmentAssignment.import(department_assignments)
-      Admin.import(admins)
+      User.insert_all(users)
+      Role.insert_all(roles)
+      Teacher.insert_all(teachers)
+      DepartmentAssignment.insert_all(department_assignments)
+      Admin.insert_all(admins)
     end
   end
 end

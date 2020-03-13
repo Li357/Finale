@@ -1,0 +1,1 @@
+ImportSchoolDataJob.perform_now

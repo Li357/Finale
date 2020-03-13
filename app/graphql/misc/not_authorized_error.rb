@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Errors
-  class NotAuthorizedError < GraphQL::ExecutionError
+  class NotAuthorized < GraphQL::ExecutionError
     def initialize
       super "Not authorized, please supply valid token!"
     end

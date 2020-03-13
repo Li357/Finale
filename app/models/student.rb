@@ -3,6 +3,7 @@
 class Student < ApplicationRecord
   self.primary_key = :user_id
   belongs_to :user
-  has_and_belongs_to_many :courses, join_table: :students_courses
-  has_and_belongs_to_many :finals, join_table: :students_finals
+  has_many :student_course_registrations
+  has_many :courses, through: :student_course_registrations
+  has_and_belongs_to_many :finals, join_table: :student_final_signups
 end

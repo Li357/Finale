@@ -9,6 +9,8 @@ ruby "2.6.5"
 gem "rails", "~> 6.0.0"
 # Use postgresql as the database for Active Record
 gem "pg", ">= 0.18", "< 2.0"
+gem "tiny_tds", "~> 2.1"
+gem "sequel", "~> 5.27"
 # Use Puma as the app server
 gem "puma", "~> 3.12"
 
@@ -41,7 +43,7 @@ group :development do
   gem "spring"
   gem "spring-watcher-listen", "~> 2.0.0"
 
-  gem 'sprockets', '~> 3'
+  gem "sprockets", "~> 3"
   gem "graphiql-rails"
 
   # gem "faker"
@@ -51,3 +53,6 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+
+gem "roo", "~> 2.8"

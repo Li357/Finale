@@ -12,12 +12,13 @@ module Mutations
     field :token, String, null: false
 
     def resolve(username:, password:)
-      user = User.find_by(username: username)
-      raise Errors::AuthenticationFailureError if user.nil?
+      normalized = username.titleize
+      user = User.find_by(username: normalized)
+      raise Errors::AuthenticationFailure if user.nil?
 
-      response = Net::HTTP.post(SCHOOL_LOGIN_URI, "username=#{username}&password=#{password}")
+      response = Net::HTTP.post(SCHOOL_LOGIN_URI, "username=#{normalized}&password=#{password}")
       # School login endpoint returns 301 status if successful, otherwise 200
-      raise Errors::AuthenticationFailureError unless response.kind_of?(Net::HTTPFound)
+      raise Errors::AuthenticationFailure unless response.kind_of?(Net::HTTPFound)
 
       payload = {
         id: user.id,

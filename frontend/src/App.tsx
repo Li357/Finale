@@ -1,12 +1,8 @@
 import React from 'react';
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 // import Navbar from './components/Navbar';
-import Login from './components/Login';
+import Login from './views/Login';
 import './App.css';
 
 function Authenticated() {
@@ -23,9 +19,7 @@ export default function App() {
         <Route path="/">
           <Authenticated />
         </Route>
-        <Route>
-
-        </Route>
+        <Route></Route>
       </Switch>
     </Router>
   );

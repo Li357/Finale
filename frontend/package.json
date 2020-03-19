@@ -3,19 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/jest": "24.0.21",
-    "@types/node": "12.12.5",
-    "@types/react": "16.9.11",
-    "@types/react-dom": "16.9.3",
+    "@apollo/client": "^3.0.0-beta.40",
+    "js-cookie": "^2.2.1",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.2.0",
-    "typescript": "3.6.4"
+    "react-scripts": "3.4.0",
+    "typescript": "^3.7.5"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build && mv build/* ../public && rm build",
+    "build:types": "yarn apollo client:codegen src/types --outputFlat --tsFileExtension=d.ts --target=typescript --globalTypesFile=src/types/graphql-globals.d.ts",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -35,6 +34,13 @@
     ]
   },
   "devDependencies": {
-    "@types/react-router-dom": "^5.1.3"
+    "@types/jest": "^25.1.4",
+    "@types/js-cookie": "^2.2.5",
+    "@types/node": "^13.9.1",
+    "@types/react": "^16.9.23",
+    "@types/react-dom": "^16.9.5",
+    "@types/react-router-dom": "^5.1.3",
+    "apollo": "^2.25.0",
+    "graphql-tag.macro": "^2.0.1"
   }
 }

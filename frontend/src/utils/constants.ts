@@ -1,0 +1,1 @@
+export const LOGIN_TOKEN_NAME = 'FINALE_LOGIN_TOKEN';

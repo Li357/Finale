@@ -1,28 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ApolloLink, ApolloClient, HttpLink, InMemoryCache, ApolloProvider, from } from '@apollo/client';
-import Cookies from 'js-cookie';
+import { ApolloClient, HttpLink, InMemoryCache, ApolloProvider } from '@apollo/client';
 
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import { LOGIN_TOKEN_NAME } from './utils/constants';
 
-const authLink = new ApolloLink((operation, forward) => {
-  operation.setContext(({ headers }: { headers: Record<string, string> }) => ({
-    headers: {
-      Authorization: `Bearer ${Cookies.get(LOGIN_TOKEN_NAME)}`,
-      ...headers,
-    },
-  }));
-  return forward(operation);
-});
-const httpLink = new HttpLink({ uri: 'http://localhost:4000/graphql' });
-const link = from([authLink, httpLink]);
-
+const httpLink = new HttpLink({ uri: 'http://localhost:4000/graphql', credentials: 'include' });
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: link,
+  link: httpLink,
 });
 
 ReactDOM.render(

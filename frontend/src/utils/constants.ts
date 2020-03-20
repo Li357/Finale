@@ -1,1 +1,1 @@
-export const LOGIN_TOKEN_NAME = 'FINALE_LOGIN_TOKEN';
+export const FINALE_COOKIE_PAYLOAD = '_fp';

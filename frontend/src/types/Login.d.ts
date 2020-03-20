@@ -9,7 +9,7 @@
 
 export interface Login_login {
   __typename: "LoginPayload";
-  token: string;
+  success: boolean;
 }
 
 export interface Login {

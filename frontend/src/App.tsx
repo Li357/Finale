@@ -1,13 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-// import Navbar from './components/Navbar';
 import Login from './views/Login';
+import Dashboard from './views/Dashboard';
+import PrivateRoute from './components/PrivateRoute';
 import './App.css';
-
-function Authenticated() {
-  return null;
-}
 
 export default function App() {
   return (
@@ -16,10 +13,9 @@ export default function App() {
         <Route exact path="/login">
           <Login />
         </Route>
-        <Route path="/">
-          <Authenticated />
-        </Route>
-        <Route></Route>
+        <PrivateRoute path="/">
+          <Dashboard />
+        </PrivateRoute>
       </Switch>
     </Router>
   );

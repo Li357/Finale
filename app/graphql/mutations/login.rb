@@ -9,7 +9,7 @@ module Mutations
     argument :username, String, required: true
     argument :password, String, required: true
 
-    field :token, String, null: false
+    field :success, Boolean, null: false
 
     def resolve(username:, password:)
       normalized = username.titleize
@@ -25,8 +25,11 @@ module Mutations
         roles: user.roles.map { |role| role.role_type },
         exp: 1.day.from_now.to_i,
       }
-      token = JWT.encode(payload, Rails.application.credentials.secret_key_base)
-      { token: token }
+      header, payload, signature = JWT.encode(payload, Rails.application.credentials.secret_key_base).split('.')
+      jar = context[:cookies]
+      jar[:_fp] = { value: "#{header}.#{payload}", expires: 1.day }
+      jar[:_fs] = { value: signature, expires: 1.day }
+      { success: true }
     end
   end
 end

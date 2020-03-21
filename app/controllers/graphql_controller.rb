@@ -10,7 +10,7 @@ class GraphqlController < ApplicationController
   private
     def get_token
       if request.headers.include?("Authorization")
-        request.headers["Authorization"].split(" ").last
+        return request.headers["Authorization"].split(" ").last
       end
       payload = cookies[Constants::FINALE_COOKIE_PAYLOAD]
       signature = cookies[Constants::FINALE_COOKIE_SIGNATURE]

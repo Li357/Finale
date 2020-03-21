@@ -7,7 +7,7 @@ class AuthenticationController < ApplicationController
     password = params[:password]
     render status: :bad_request if (username.nil? or password.nil?) and return
 
-    normalized = username.titleized
+    normalized = username.titleize
     user = User.find_by(username: normalized)
     render status: :unauthorized if user.nil? and return
 

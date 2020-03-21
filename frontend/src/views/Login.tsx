@@ -4,9 +4,9 @@ import cookies from 'js-cookie';
 
 import Input from '../components/Input';
 import Button from '../components/Button';
-import logo from '../assets/WHS.png';
-import '../styles/Login.css';
+import Logo from '../components/Logo';
 import { FINALE_COOKIE_PAYLOAD, FINALE_LOGIN_URI } from '../utils/constants';
+import '../styles/Login.css';
 
 async function loginWithCredentials(username: string, password: string) {
   const response = await fetch(FINALE_LOGIN_URI, {
@@ -58,7 +58,7 @@ export default function Login() {
   return (
     <div className="screen login">
       <div className="login-container">
-        <img className="logo" src={logo} alt="WHS Logo" />
+        <Logo />
         <h1 className="text-title">Sign up for your finals</h1>
         <span className="text-body">Login to your WHS account</span>
         <Input placeholder="Username" value={username} onChange={onChangeUsername} />

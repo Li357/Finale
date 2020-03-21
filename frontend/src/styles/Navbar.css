@@ -1,0 +1,31 @@
+.navbar {
+  --item-height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  margin: var(--content-margin);
+}
+
+.navbar > svg {
+  height: var(--item-height);
+}
+
+.navbar-profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.navbar-profile-name {
+  font-weight: bold;
+}
+
+.navbar-profile-photo {
+  width: var(--item-height);
+  height: var(--item-height);
+  border-radius: 50%;
+  object-fit: cover;
+  margin-left: 20px;
+}

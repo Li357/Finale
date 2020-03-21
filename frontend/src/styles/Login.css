@@ -14,10 +14,8 @@
   width: 350px;
 }
 
-.logo {
-  align-self: center;
-  width: 60%;
-  height: auto;
+.login-container > svg {
+  margin: 0 50px;
 }
 
 .login-container > h1.text-title {

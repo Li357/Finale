@@ -23,6 +23,8 @@ class GraphqlController < ApplicationController
       payload = JWT.decode(token, Rails.application.credentials.secret_key_base).first
       User.find_by(id: payload["id"]).to_role
     rescue ActiveSupport::MessageVerifier::InvalidSignature, JWT::DecodeError, JWT::VerificationError, JWT::ExpiredSignature
+      cookies.delete FINALE_COOKIE_PAYLOAD
+      cookies.delete FINALE_COOKIE_SIGNATURE
       nil
     end
 end

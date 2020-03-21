@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import Login from './views/Login';
-import Dashboard from './views/Dashboard';
 import PrivateRoute from './components/PrivateRoute';
+import Summary from './views/Summary';
 import './App.css';
 
 export default function App() {
@@ -14,7 +14,7 @@ export default function App() {
           <Login />
         </Route>
         <PrivateRoute path="/">
-          <Dashboard />
+          <Summary />
         </PrivateRoute>
       </Switch>
     </Router>

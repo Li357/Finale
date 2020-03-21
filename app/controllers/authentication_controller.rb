@@ -5,15 +5,15 @@ class AuthenticationController < ApplicationController
   def login
     username = params[:username]
     password = params[:password]
-    render status: :bad_request if (username.nil? or password.nil?) and return
+    return render status: :bad_request if username.nil? || password.nil?
 
     normalized = username.titleize
     user = User.find_by(username: normalized)
-    render status: :unauthorized if user.nil? and return
+    return render status: :unauthorized if user.nil?
 
     # School login endpoint returns 301 status if successful, otherwise 200
     response = Net::HTTP.post(Constants::SCHOOL_LOGIN_URI, "username=#{normalized}&password=#{password}")
-    render status: :unauthorized unless response.kind_of?(Net::HTTPFound) and return
+    return render status: :unauthorized unless response.kind_of?(Net::HTTPFound)
 
     payload = {
       id: user.id,
@@ -21,8 +21,8 @@ class AuthenticationController < ApplicationController
       exp: 1.day.from_now.to_i,
     }
     token = JWT.encode(payload, Rails.application.credentials.secret_key_base)
-    if headers['X-Requested-With'] == Constants::FINALE_NATIVE_CLIENT
-      render json: { token: token } and return
+    if request.headers['X-Requested-With'] == Constants::FINALE_NATIVE_CLIENT
+      return render json: { token: token }
     end
 
     header, payload, signature = token.split('.')

@@ -7,10 +7,10 @@ class FinaleSchema < GraphQL::Schema
   subscription(Types::SubscriptionType)
 
   def self.unauthorized_object(error)
-    raise Errors::NotAuthorizedError
+    raise Errors::NotAuthorized
   end
 
   def self.unauthorized_field(error)
-    raise Errors::NotAuthorizedError
+    raise Errors::NotAuthorized
   end
 end

@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  post "/login", to: "authentication#login"
+  post "/logout", to: "authentication#logout"
   post "/graphql", to: "graphql#execute"
   get "*path", to: "application#frontend", constraints: ->(request) { frontend_request?(request) }
 

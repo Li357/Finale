@@ -5,8 +5,9 @@ import { ApolloClient, HttpLink, InMemoryCache, ApolloProvider } from '@apollo/c
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { FINALE_GRAPHQL_URI } from './utils/constants';
 
-const httpLink = new HttpLink({ uri: 'http://localhost:4000/graphql', credentials: 'include' });
+const httpLink = new HttpLink({ uri: FINALE_GRAPHQL_URI, credentials: 'include' });
 const client = new ApolloClient({
   cache: new InMemoryCache(),
   link: httpLink,

@@ -1,31 +1,43 @@
 import React, { useState, ChangeEvent } from 'react';
 import { Redirect } from 'react-router-dom';
-import { useMutation } from '@apollo/client';
-import gql from 'graphql-tag.macro';
 import cookies from 'js-cookie';
 
 import Input from '../components/Input';
 import Button from '../components/Button';
 import logo from '../assets/WHS.png';
 import '../styles/Login.css';
-import { Login_login, LoginVariables } from '../types/Login';
-import { FINALE_COOKIE_PAYLOAD } from '../utils/constants';
+import { FINALE_COOKIE_PAYLOAD, FINALE_LOGIN_URI } from '../utils/constants';
 
-const LOGIN = gql`
-  mutation Login($username: String!, $password: String!) {
-    login(username: $username, password: $password) {
-      success
-    }
+async function loginWithCredentials(username: string, password: string) {
+  const response = await fetch(FINALE_LOGIN_URI, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  return response.ok;
+}
+
+function useLogin(): [boolean, (username: string, password: string) => Promise<void>] {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const login = async (username: string, password: string) => {
+    const ok = await loginWithCredentials(username, password);
+    setLoggedIn(ok);
+  };
+
+  if (!loggedIn && cookies.get(FINALE_COOKIE_PAYLOAD) !== undefined) {
+    setLoggedIn(true);
   }
-`;
+  return [loggedIn, login];
+}
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setLoading] = useState(false);
-  const [login, { data }] = useMutation<{ login: Login_login }, LoginVariables>(LOGIN);
+  const [loggedIn, login] = useLogin();
 
-  if (data?.login.success || cookies.get(FINALE_COOKIE_PAYLOAD)) {
+  if (loggedIn) {
     return <Redirect to="/" />;
   }
 
@@ -39,7 +51,7 @@ export default function Login() {
 
   const loginWithCredentials = () => {
     setLoading(true);
-    login({ variables: { username, password } });
+    login(username, password);
   };
 
   const disabled = username.length === 0 || password.length === 0 || isLoading;

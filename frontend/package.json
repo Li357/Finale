@@ -15,6 +15,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build && mv build/* ../public && rm build",
     "build:types": "yarn apollo client:codegen src/types --outputFlat --tsFileExtension=d.ts --target=typescript --globalTypesFile=src/types/graphql-globals.d.ts",
+    "clean:types": "rm -rf src/types",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

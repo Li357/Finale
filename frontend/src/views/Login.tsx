@@ -38,7 +38,7 @@ export default function Login() {
   const [loggedIn, login] = useLogin();
 
   if (loggedIn) {
-    return <Redirect to="/" />;
+    return <Redirect to="/summary" />;
   }
 
   const onChangeUsername = (event: ChangeEvent<HTMLInputElement>) => {
@@ -49,9 +49,12 @@ export default function Login() {
     setPassword(event.target.value);
   };
 
-  const loginWithCredentials = () => {
+  const loginWithCredentials = async () => {
     setLoading(true);
-    login(username, password);
+    try {
+      await login(username, password);
+    } catch (error) {}
+    setLoading(false);
   };
 
   const disabled = username.length === 0 || password.length === 0 || isLoading;

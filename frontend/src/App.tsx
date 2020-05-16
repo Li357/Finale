@@ -2,9 +2,10 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
 import Login from './views/Login';
-import PrivateRoute from './components/PrivateRoute';
-import Summary from './views/Summary';
+import StudentRoute from './components/StudentRoute';
+import Summary from './views/student/Summary';
 import './App.css';
+import TeacherRoute from './components/TeacherRoute';
 
 export default function App() {
   return (
@@ -13,9 +14,9 @@ export default function App() {
         <Route exact path="/login">
           <Login />
         </Route>
-        <PrivateRoute path="/">
+        <StudentRoute path="/summary">
           <Summary />
-        </PrivateRoute>
+        </StudentRoute>
       </Switch>
     </Router>
   );

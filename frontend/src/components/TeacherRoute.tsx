@@ -1,15 +1,15 @@
 import React from 'react';
 import { RouteProps, Route, Redirect } from 'react-router-dom';
-import cookies from 'js-cookie';
-import { FINALE_COOKIE_PAYLOAD } from '../utils/constants';
+
+import { hasRole } from '../utils/user';
 import Container from './Container';
 
-export default function PrivateRoute({ children, ...rest }: RouteProps) {
+export default function TeacherRoute({ children, ...rest }: RouteProps) {
   return (
     <Route
       {...rest}
       render={({ location }) => {
-        if (cookies.get(FINALE_COOKIE_PAYLOAD)) {
+        if (hasRole('teacher')) {
           return <Container>{children}</Container>;
         }
         return <Redirect to={{ pathname: '/login', state: { from: location } }} />;

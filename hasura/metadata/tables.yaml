@@ -1,0 +1,39 @@
+- table:
+    schema: public
+    name: admins
+- table:
+    schema: public
+    name: courses
+- table:
+    schema: public
+    name: department_assignments
+- table:
+    schema: public
+    name: departments
+- table:
+    schema: public
+    name: finals
+- table:
+    schema: public
+    name: roles
+- table:
+    schema: public
+    name: student_course_registrations
+- table:
+    schema: public
+    name: student_final_signups
+- table:
+    schema: public
+    name: students
+- table:
+    schema: public
+    name: teacher_course_registrations
+- table:
+    schema: public
+    name: teacher_final_assignments
+- table:
+    schema: public
+    name: teachers
+- table:
+    schema: public
+    name: users

@@ -1,9 +1,0 @@
-input {
-  padding: var(--form-margin-vertical) 15px;
-  border-radius: 30px;
-  border: var(--border);
-}
-
-input:focus, input:target, input:active {
-  outline: none;
-}

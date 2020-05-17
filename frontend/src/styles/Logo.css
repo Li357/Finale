@@ -1,9 +1,0 @@
-.logo-outline {
-  fill: none;
-  stroke: var(--color-accent);
-  stroke-width: 20px;
-}
-
-.logo-shadow {
-  fill: var(--color-accent);
-}

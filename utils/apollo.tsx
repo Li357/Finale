@@ -9,7 +9,7 @@ export default function createApolloClient(
   return new ApolloClient({
     ssrMode: Boolean(ctx),
     link: new HttpLink({
-      uri: 'https://covid-nyt-api.now.sh/graphql',
+      uri: process.env.NEXT_PUBLIC_HASURA_URI,
       fetch,
     }),
     cache: new InMemoryCache().restore(initialState),

@@ -22,3 +22,5 @@ Finals sign up application for [Westside High School](https://whs.westside66.org
   - All teachers of a department/co-taught class should be able to see signups
 - **Dockerize**
 
+### Setup
+
